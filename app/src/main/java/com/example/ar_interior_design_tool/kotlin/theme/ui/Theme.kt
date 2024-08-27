@@ -1,6 +1,5 @@
-package com.example.ar_interior_design_tool.ui.theme
+package com.example.ar_interior_design_tool.kotlin.theme.ui
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

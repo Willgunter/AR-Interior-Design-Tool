@@ -1,4 +1,4 @@
-package com.example.ar_interior_design_tool.ui.theme
+package com.example.ar_interior_design_tool.kotlin.theme.ui
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
