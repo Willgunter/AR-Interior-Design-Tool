@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-    // implementation 'com.google.ar:core:1.33.0'
+//    implementation(libs.androidx.activity)
     implementation(libs.ar.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.inappmessaging)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
