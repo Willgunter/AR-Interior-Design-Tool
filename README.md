@@ -15,7 +15,7 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
 
   - 8/27/2024
     - Copied Helper classes from ARCore tutorial codebase and fixed a bunch of file errors
-    - Modernized a deprecated way of requesting permissions
+    - Modernized a deprecated way of requesting permissions (onRequestPermissionsResult --> registerForActivityResult)
 
 Resources used:
   - (Basic Todo list tutorial in Kotlin) [https://github.com/philipplackner/TodoList/blob/master/app/src/main/java/com/example/todolist/MainActivity.kt]
