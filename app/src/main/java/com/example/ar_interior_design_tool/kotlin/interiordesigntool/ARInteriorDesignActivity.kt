@@ -53,7 +53,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
     //  helps with basic ARCore operations
     lateinit var arCoreSessionHelper: ARCoreSessionLifecycleHelper
 
-    // note sure what these are for
+    // not sure what these are for
     lateinit var view: ARInteriorDesignView
     lateinit var renderer: ARInteriorDesignRenderer
 
@@ -63,7 +63,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
     // basically like a normal java constructor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
 
         // Setup ARCore session lifecycle helper and configuration.
         arCoreSessionHelper = ARCoreSessionLifecycleHelper(this)
@@ -74,6 +74,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
         // from above
         requestPermission.launch(Manifest.permission.CAMERA)
 
+        // is used in LifecycleHelper I think
         arCoreSessionHelper.exceptionCallback =
             { exception ->
                 val message =
@@ -110,52 +111,19 @@ class ARInteriorDesignActivity : ComponentActivity() {
         depthSettings.onCreate(this)
         instantPlacementSettings.onCreate(this)
 
-    //  might not need
-    //  val mArButton = findViewById<Button>(R.id.mArButton)
-    //  mArButton.setOnClickListener {
-    //  maybeEnableArButton(mArButton)
-    //  }
-
     }
-
-//    @Deprecated {"asdfas;ldkfja;sldkfj"}
-//    override fun registerForActivityResult(
-//
-//    ) {
-//
-//        super.onRequestPermissionsResult(requestCode, permissions, results)
-//        if (!CameraPermissionHelper.hasCameraPermission(this)) {
-//            Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
-//                .show()
-//            if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
-//                // Permission denied with checking "Do not ask again".
-//                CameraPermissionHelper.launchPermissionSettings(this)
-//            }
-//            finish()
-//        }
-//    }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         FullScreenHelper.setFullScreenOnWindowFocusChanged(this, hasFocus)
     }
-// might not need idk
-//    private fun maybeEnableArButton(mArButton: Button) {
-//        ArCoreApk.getInstance().checkAvailabilityAsync(this) { availability ->
-//            if (availability.isSupported) {
-//                mArButton.visibility = View.VISIBLE
-//                mArButton.isEnabled = true
-//            } else { // The device is unsupported or unknown.
-//                mArButton.visibility = View.INVISIBLE
-//                mArButton.isEnabled = false
-//            }
-//        }
-//    }
 
     // Configure the session, using Lighting Estimation, and Depth mode.
     fun configureSession(session: Session) {
         session.configure(
             session.config.apply {
+                                            // Note: can be changed vvv (AMBIENT_INTENSITY = lower quality
+                                            // DISABLED = lowest quality
                 lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
 
                 // Depth API is used if it is configured in AR Interior Design's settings.
@@ -175,22 +143,6 @@ class ARInteriorDesignActivity : ComponentActivity() {
                     }
             }
         )
-    }
-
-    @Composable
-    fun Greeting(name: String, modifier: Modifier = Modifier) {
-        Text(
-            text = "Hello $name!",
-            modifier = modifier
-        )
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun GreetingPreview() {
-        ARInteriorDesignToolTheme {
-            Greeting("Android")
-        }
     }
 
 }

@@ -16,6 +16,7 @@
 package com.example.ar_interior_design_tool.java.common.helpers;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -128,6 +129,7 @@ public final class SnackbarHelper {
                     message,
                     duration);
             messageSnackbar.getView().setBackgroundColor(BACKGROUND_COLOR);
+            Log.v("SnackbarHelper", "TextView: ");
             if (dismissBehavior != DismissBehavior.HIDE && duration == Snackbar.LENGTH_INDEFINITE) {
               messageSnackbar.setAction(
                   "Dismiss",

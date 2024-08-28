@@ -33,22 +33,22 @@ import com.example.ar_interior_design_tool.java.common.helpers.TapHelper
 class ARInteriorDesignView(val activity: ARInteriorDesignActivity) : DefaultLifecycleObserver {
     val root = View.inflate(activity, R.layout.activity_main, null)
     val surfaceView = root.findViewById<GLSurfaceView>(R.id.surfaceview)
-    val settingsButton =
-        root.findViewById<ImageButton>(R.id.settings_button).apply {
-            setOnClickListener { v ->
-                PopupMenu(activity, v).apply {
-                    setOnMenuItemClickListener { item ->
-                        when (item.itemId) {
-                            R.id.depth_settings -> launchDepthSettingsMenuDialog()
-                            R.id.instant_placement_settings -> launchInstantPlacementSettingsMenuDialog()
-                            else -> null
-                        } != null
-                    }
-                    inflate(R.menu.settings_menu)
-                    show()
-                }
-            }
-        }
+//    val settingsButton =
+//        root.findViewById<ImageButton>(R.id.settings_button).apply {
+//            setOnClickListener { v ->
+//                PopupMenu(activity, v).apply {
+//                    setOnMenuItemClickListener { item ->
+//                        when (item.itemId) {
+//                            R.id.depth_settings -> launchDepthSettingsMenuDialog()
+//                            R.id.instant_placement_settings -> launchInstantPlacementSettingsMenuDialog()
+//                            else -> null
+//                        } != null
+//                    }
+//                    inflate(R.menu.settings_menu)
+//                    show()
+//                }
+//            }
+//        }
 
     val session
         get() = activity.arCoreSessionHelper.session

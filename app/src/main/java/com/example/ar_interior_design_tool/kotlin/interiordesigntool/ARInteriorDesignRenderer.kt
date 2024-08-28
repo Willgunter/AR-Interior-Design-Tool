@@ -456,6 +456,10 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         // 1. The normalized spherical harmonics basis functions (y_lm)
         //
         // 2. The lambertian diffuse BRDF factor (1/pi)
+
+        // I could change BRDF to be something else maybe (glossy or mirror)?
+        // https://en.wikipedia.org/wiki/Bidirectional_reflectance_distribution_function
+        // or change something else for resume purposes
         //
         // 3. A <cos> convolution. This is done to so that the resulting function outputs the irradiance
         // of all incoming light over a hemisphere for a given surface normal, which is what the shader
