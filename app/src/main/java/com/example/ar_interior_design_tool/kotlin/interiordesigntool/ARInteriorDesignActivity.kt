@@ -3,17 +3,10 @@ package com.example.ar_interior_design_tool.kotlin.interiordesigntool
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-//import com.example.ar_interior_design_tool.Manifest
 import android.Manifest
 import com.example.ar_interior_design_tool.R
 import com.google.ar.core.Session
-import com.example.ar_interior_design_tool.kotlin.theme.ui.ARInteriorDesignToolTheme
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
 import com.example.ar_interior_design_tool.java.common.helpers.DepthSettings
 import com.example.ar_interior_design_tool.java.common.helpers.FullScreenHelper
@@ -27,8 +20,6 @@ import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
-import java.io.File
-import java.io.IOException
 
 class ARInteriorDesignActivity : ComponentActivity() {
 
