@@ -27,6 +27,8 @@ import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
+import java.io.File
+import java.io.IOException
 
 class ARInteriorDesignActivity : ComponentActivity() {
 
@@ -64,7 +66,6 @@ class ARInteriorDesignActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
-
         // Setup ARCore session lifecycle helper and configuration.
         arCoreSessionHelper = ARCoreSessionLifecycleHelper(this)
 
@@ -73,6 +74,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
         // requests permission to access camera using lambda expression
         // from above
         requestPermission.launch(Manifest.permission.CAMERA)
+        requestPermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         // is used in LifecycleHelper I think
         arCoreSessionHelper.exceptionCallback =

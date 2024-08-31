@@ -23,6 +23,11 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
     - Ran into a ridiculously hard problem  (literally thought it was impossible) involving the Snackbar and the theme of the app,
     luckily a random StackOverflow post came to the rescue*
     - First working version on phone's app involving AR worked today
+    - Exploring how to display a different thing than the default pawn
+    
+  - 8/30/2024
+    - ⭐Tried to start printing out PointCloud data into a file - took a while but 
+    got it to transfer to a FrameArray variable and read all the FrameBuffer into the debug log
 
 Resources used:
   - (Basic Todo list tutorial in Kotlin) [https://github.com/philipplackner/TodoList/blob/master/app/src/main/java/com/example/todolist/MainActivity.kt]

@@ -45,7 +45,6 @@ import com.example.ar_interior_design_tool.java.common.samplerenderer.VertexBuff
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BackgroundRenderer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.PlaneRenderer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.SpecularCubemapFilter
-import com.example.ar_interior_design_tool.kotlin.interiordesigntool.ARInteriorDesignActivity
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
 import java.io.IOException
@@ -55,7 +54,7 @@ import java.nio.ByteBuffer
 class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     SampleRender.Renderer, DefaultLifecycleObserver {
     companion object {
-        val TAG = "HelloArRenderer"
+        val TAG = "ARInteriorDesignRenderer"
 
         // See the definition of updateSphericalHarmonicsCoefficients for an explanation of these
         // constants.
@@ -106,6 +105,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     var lastPointCloudTimestamp: Long = 0
 
     // Virtual object (ARCore pawn)
+    // TODO: switch to some other object
     lateinit var virtualObjectMesh: Mesh
     lateinit var virtualObjectShader: Shader
     lateinit var virtualObjectAlbedoTexture: Texture
@@ -360,6 +360,26 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         // Get camera matrix and draw.
         camera.getViewMatrix(viewMatrix, 0)
         frame.acquirePointCloud().use { pointCloud ->
+
+            // goal: write point cloud to a file so I can visualize it
+            // problem: you don't have permission to write things in Kotlin
+            // change number values to print out more / less objects
+            if (pointCloud.points.limit() in 100..999) {
+                val dst = FloatArray(40)
+                pointCloud.points.get(dst)
+                // every four values is an x, y, z and confidence value
+                val res = StringBuilder()
+                for (i in dst) {
+                    res.append(i.toString())
+                    res.append(",")
+                    if (res.length % 4 == 0) {
+                        res.append(" ")
+                    }
+                }
+                Log.v(TAG, res.toString())
+
+            }
+
             if (pointCloud.timestamp > lastPointCloudTimestamp) {
                 pointCloudVertexBuffer.set(pointCloud.points)
                 lastPointCloudTimestamp = pointCloud.timestamp
@@ -411,6 +431,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
 
         // Compose the virtual scene with the background.
         backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR)
+
     }
 
     /** Checks if we detected at least one plane. */
