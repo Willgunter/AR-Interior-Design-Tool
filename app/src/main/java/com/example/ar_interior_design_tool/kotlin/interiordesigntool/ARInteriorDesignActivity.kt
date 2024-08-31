@@ -30,7 +30,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
 
     // requestInstall(Activity, true) will triggers installation of
     // Google Play Services for AR if necessary.
-    private var mUserRequestedInstall = true
+//    private var mUserRequestedInstall = true
 
     private val requestPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()
