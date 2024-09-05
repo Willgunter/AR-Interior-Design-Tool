@@ -88,7 +88,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         // camera. Use larger values for experiences where the user will likely be standing and trying
         // to
         // place an object on the ground or floor in front of them.
-        val APPROXIMATE_DISTANCE_METERS = 2.0f
+        val APPROXIMATE_DISTANCE_METERS = 0.5f // was 2.0f
 
         val CUBEMAP_RESOLUTION = 16
         val CUBEMAP_NUMBER_OF_IMPORTANCE_SAMPLES = 32
@@ -366,33 +366,37 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         // Get camera matrix and draw.
         camera.getViewMatrix(viewMatrix, 0)
         frame.acquirePointCloud().use { pointCloud ->
+
+            var len = pointCloud.points.limit()
+            while (len % 4 != 0) {
+                len++ // needs to be multiple of 4
+            }
+
             Log.v(TAG, pointCloud.points.limit().toString())
             // goal: write point cloud to a file so I can visualize it
             // change number values to print out more / less objects
-            if (pointCloud.points.limit() in 80..10000000) {
-                val dst = FloatArray(40) // size doesn't matter for now I think???
-                pointCloud.points.get(dst)
-                // every four values is an x, y, z and confidence value
-                val res = StringBuilder()
-                val itr = dst.iterator()
-                while (itr.hasNext()) {
-                    res.append("%.5f".format(itr.next()))
-                    res.append(" ")
-                    res.append("%.5f".format(itr.next()))
-                    res.append(" ")
-                    res.append("%.5f".format(itr.next()))
-                    res.append(" 4.2108e+06\n")
-                    itr.next().toString() // throwaway confidence value
-                }
+            val dst = FloatArray(len) // size doesn't matter for now I think???
+            pointCloud.points.get(dst)
+            // every four values is an x, y, z and confidence value
+            val res = StringBuilder()
+            val itr = dst.iterator()
+            while (itr.hasNext()) {
+                res.append("%.5f".format(itr.next()))
+                res.append(" ")
+                res.append("%.5f".format(itr.next()))
+                res.append(" ")
+                res.append("%.5f".format(itr.next()))
+                res.append(" 4.2108e+06\n")
+                itr.next().toString() // throwaway confidence value
+            }
 
-                // holds current value of file
-                val fileContent = activity.openFileInput("idk").bufferedReader().use {
-                    it.readText()
-                }
+            // holds current value of file
+            val fileContent = activity.openFileInput("idk").bufferedReader().use {
+                it.readText()
+            }
 
-                activity.openFileOutput("idk", Context.MODE_PRIVATE).use {
-                    it.write(fileContent.toString().toByteArray() + res.toString().toByteArray())
-                }
+            activity.openFileOutput("idk", Context.MODE_PRIVATE).use {
+                it.write(fileContent.toString().toByteArray() + res.toString().toByteArray())
             }
 
             if (pointCloud.timestamp > lastPointCloudTimestamp) {

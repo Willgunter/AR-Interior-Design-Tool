@@ -44,7 +44,15 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
     - Figured out how to write to the file, and how to access the file
     - ⭐Ran into a huge problem printing out the points but solved it and now get reasonably good Point Cloud images
   
-  NOTE TO SELF: INSERT A POINT CLOUD IMAGE HERE  
+    
+  - 9/5/2024
+    - Changed code up a bit to print out point cloud data a lot better
+    - Experimented a bit with trying to scan water bottle. problem is that the water bottle is transparent
+    - Further experimentation is needed with non-transparent objects, but I think now might be a good time
+    to start looking at ways to do mesh-generation / object reconstruction / filtering
+    
+  - NOTE TO SELF: INSERT A POINT CLOUD IMAGE HERE, try again with point cloud data in 1) better lighting
+  and 2) your whole room instead of just a small desk
 
 
 Resources used:
