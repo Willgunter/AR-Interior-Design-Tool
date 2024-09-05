@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import android.Manifest
+import android.content.Context
 import com.example.ar_interior_design_tool.R
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
@@ -20,6 +21,7 @@ import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
+import java.io.File
 
 class ARInteriorDesignActivity : ComponentActivity() {
 
@@ -32,7 +34,9 @@ class ARInteriorDesignActivity : ComponentActivity() {
     // Google Play Services for AR if necessary.
 //    private var mUserRequestedInstall = true
 
-    private val requestPermission =
+//    lateinit var file: File
+
+    private val requestPermission = 
         registerForActivityResult(ActivityResultContracts.RequestPermission()
         ) { isGranted ->
             // Do something if permission granted
@@ -57,6 +61,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
+
         // Setup ARCore session lifecycle helper and configuration.
         arCoreSessionHelper = ARCoreSessionLifecycleHelper(this)
 
@@ -84,7 +89,6 @@ class ARInteriorDesignActivity : ComponentActivity() {
                 view.snackbarHelper.showError(this, message)
             }
 
-
         // Configure session features, including: Lighting Estimation, Depth mode, Instant Placement.
         arCoreSessionHelper.beforeSessionResume = ::configureSession
         lifecycle.addObserver(arCoreSessionHelper)
@@ -103,6 +107,7 @@ class ARInteriorDesignActivity : ComponentActivity() {
 
         depthSettings.onCreate(this)
         instantPlacementSettings.onCreate(this)
+
 
     }
 

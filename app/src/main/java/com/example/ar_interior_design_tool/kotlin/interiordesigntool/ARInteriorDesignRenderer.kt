@@ -15,6 +15,7 @@
  */
 package com.example.ar_interior_design_tool.kotlin.interiordesigntool
 
+import android.content.Context
 import android.opengl.GLES30
 import android.opengl.Matrix
 import android.util.Log
@@ -47,12 +48,16 @@ import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.Pla
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.SpecularCubemapFilter
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
+import java.io.File
+import java.io.FileWriter
 import java.io.IOException
+import java.io.OutputStreamWriter
 import java.nio.ByteBuffer
 
 /** Renders the HelloAR application using our example Renderer. */
 class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     SampleRender.Renderer, DefaultLifecycleObserver {
+
     companion object {
         val TAG = "ARInteriorDesignRenderer"
 
@@ -93,6 +98,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     lateinit var planeRenderer: PlaneRenderer
     lateinit var backgroundRenderer: BackgroundRenderer
     lateinit var virtualSceneFramebuffer: Framebuffer
+
     var hasSetTextureNames = false
 
     // Point Cloud
@@ -360,24 +366,33 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         // Get camera matrix and draw.
         camera.getViewMatrix(viewMatrix, 0)
         frame.acquirePointCloud().use { pointCloud ->
-
+            Log.v(TAG, pointCloud.points.limit().toString())
             // goal: write point cloud to a file so I can visualize it
-            // problem: you don't have permission to write things in Kotlin
             // change number values to print out more / less objects
-            if (pointCloud.points.limit() in 100..999) {
-                val dst = FloatArray(40)
+            if (pointCloud.points.limit() in 80..10000000) {
+                val dst = FloatArray(40) // size doesn't matter for now I think???
                 pointCloud.points.get(dst)
                 // every four values is an x, y, z and confidence value
                 val res = StringBuilder()
-                for (i in dst) {
-                    res.append(i.toString())
-                    res.append(",")
-                    if (res.length % 4 == 0) {
-                        res.append(" ")
-                    }
+                val itr = dst.iterator()
+                while (itr.hasNext()) {
+                    res.append("%.5f".format(itr.next()))
+                    res.append(" ")
+                    res.append("%.5f".format(itr.next()))
+                    res.append(" ")
+                    res.append("%.5f".format(itr.next()))
+                    res.append(" 4.2108e+06\n")
+                    itr.next().toString() // throwaway confidence value
                 }
-                Log.v(TAG, res.toString())
 
+                // holds current value of file
+                val fileContent = activity.openFileInput("idk").bufferedReader().use {
+                    it.readText()
+                }
+
+                activity.openFileOutput("idk", Context.MODE_PRIVATE).use {
+                    it.write(fileContent.toString().toByteArray() + res.toString().toByteArray())
+                }
             }
 
             if (pointCloud.timestamp > lastPointCloudTimestamp) {
