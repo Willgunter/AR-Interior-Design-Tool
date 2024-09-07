@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import android.Manifest
-import android.content.Context
 import com.example.ar_interior_design_tool.R
 import com.google.ar.core.Session
 import com.google.ar.core.exceptions.UnavailableUserDeclinedInstallationException
@@ -21,7 +20,6 @@ import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.UnavailableApkTooOldException
 import com.google.ar.core.exceptions.UnavailableDeviceNotCompatibleException
 import com.google.ar.core.exceptions.UnavailableSdkTooOldException
-import java.io.File
 
 class ARInteriorDesignActivity : ComponentActivity() {
 
@@ -72,26 +70,40 @@ class ARInteriorDesignActivity : ComponentActivity() {
         requestPermission.launch(Manifest.permission.CAMERA)
         requestPermission.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+        // WAS AFTER SESSION HELPER AND BEFORE RENDERER
+        // Configure session features, including: Lighting Estimation, Depth mode, Instant Placement.
+        arCoreSessionHelper.beforeSessionResume = ::configureSession
+        lifecycle.addObserver(arCoreSessionHelper)
+
         // is used in LifecycleHelper I think
         arCoreSessionHelper.exceptionCallback =
             { exception ->
                 val message =
-                    when (exception) {
-                        is UnavailableUserDeclinedInstallationException ->
-                            "Please install Google Play Services for AR"
-                        is UnavailableApkTooOldException -> "Please update ARCore"
-                        is UnavailableSdkTooOldException -> "Please update this app"
-                        is UnavailableDeviceNotCompatibleException -> "This device does not support AR"
-                        is CameraNotAvailableException -> "Camera not available. Try restarting the app."
-                        else -> "Failed to create AR session: $exception"
+                    if (arCoreSessionHelper.session == null) {
+                        "why me"
+                    } else if (arCoreSessionHelper.session?.config == null) {
+                        "why me"
+                    } else if (arCoreSessionHelper.session?.config?.depthMode == Config.DepthMode.DISABLED) {
+                        "This device does not support the ARCore Raw Depth API. See" +
+                                "https://developers.google.com/ar/devices for " +
+                                "a list of devices that do."
+                    }
+                    else {
+                        when (exception) {
+                            is UnavailableUserDeclinedInstallationException ->
+                                "Please install Google Play Services for AR"
+                            is UnavailableApkTooOldException -> "Please update ARCore"
+                            is UnavailableSdkTooOldException -> "Please update this app"
+                            is UnavailableDeviceNotCompatibleException -> "This device does not support AR"
+                            is CameraNotAvailableException -> "Camera not available. Try restarting the app."
+                            else -> "Failed to create AR session: $exception"
+                        }
                     }
                 Log.e(TAG, "ARCore threw an exception", exception)
                 view.snackbarHelper.showError(this, message)
             }
 
-        // Configure session features, including: Lighting Estimation, Depth mode, Instant Placement.
-        arCoreSessionHelper.beforeSessionResume = ::configureSession
-        lifecycle.addObserver(arCoreSessionHelper)
+        Log.e(TAG, "It works until here")
 
         // Set up the AR Interior Design renderer.
         renderer = ARInteriorDesignRenderer(this)
@@ -126,11 +138,21 @@ class ARInteriorDesignActivity : ComponentActivity() {
 
                 // Depth API is used if it is configured in AR Interior Design's settings.
                 depthMode =
-                    if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
-                        Config.DepthMode.AUTOMATIC
+                    if (session.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
+                        Config.DepthMode.RAW_DEPTH_ONLY
                     } else {
                         Config.DepthMode.DISABLED
                     }
+                // ^^^ raw depth ^^^
+                // vvv regular depth vvv
+//                    if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+//                        Config.DepthMode.AUTOMATIC
+//                    } else {
+//                        Config.DepthMode.DISABLED
+//                    }
+
+                // part of raw depth tutorial. not sure what this does
+                focusMode = Config.FocusMode.AUTO
 
                 // Instant Placement is used if it is configured in Hello AR's settings.
                 instantPlacementMode =
@@ -142,5 +164,4 @@ class ARInteriorDesignActivity : ComponentActivity() {
             }
         )
     }
-
 }

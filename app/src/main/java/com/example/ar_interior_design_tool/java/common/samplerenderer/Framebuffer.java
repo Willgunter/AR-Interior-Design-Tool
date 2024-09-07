@@ -15,6 +15,7 @@
  */
 package com.example.ar_interior_design_tool.java.common.samplerenderer;
 
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.util.Log;
 

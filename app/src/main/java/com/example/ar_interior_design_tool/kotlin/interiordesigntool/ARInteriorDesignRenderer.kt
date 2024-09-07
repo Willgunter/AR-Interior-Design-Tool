@@ -16,12 +16,26 @@
 package com.example.ar_interior_design_tool.kotlin.interiordesigntool
 
 import android.content.Context
+import android.opengl.GLES20
 import android.opengl.GLES30
 import android.opengl.Matrix
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.ar_interior_design_tool.R
+import com.example.ar_interior_design_tool.java.common.helpers.DisplayRotationHelper
+import com.example.ar_interior_design_tool.java.common.helpers.TrackingStateHelper
+import com.example.ar_interior_design_tool.java.common.samplerenderer.Framebuffer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.GLError
+import com.example.ar_interior_design_tool.java.common.samplerenderer.Mesh
+import com.example.ar_interior_design_tool.java.common.samplerenderer.SampleRender
+import com.example.ar_interior_design_tool.java.common.samplerenderer.Shader
+import com.example.ar_interior_design_tool.java.common.samplerenderer.Texture
+import com.example.ar_interior_design_tool.java.common.samplerenderer.VertexBuffer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BackgroundRenderer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.DepthRenderer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.PlaneRenderer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.SpecularCubemapFilter
 import com.google.ar.core.Anchor
 import com.google.ar.core.Camera
 import com.google.ar.core.DepthPoint
@@ -34,25 +48,11 @@ import com.google.ar.core.Session
 import com.google.ar.core.Trackable
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
-import com.example.ar_interior_design_tool.java.common.helpers.DisplayRotationHelper
-import com.example.ar_interior_design_tool.java.common.helpers.TrackingStateHelper
-import com.example.ar_interior_design_tool.java.common.samplerenderer.Framebuffer
-import com.example.ar_interior_design_tool.java.common.samplerenderer.GLError
-import com.example.ar_interior_design_tool.java.common.samplerenderer.Mesh
-import com.example.ar_interior_design_tool.java.common.samplerenderer.SampleRender
-import com.example.ar_interior_design_tool.java.common.samplerenderer.Shader
-import com.example.ar_interior_design_tool.java.common.samplerenderer.Texture
-import com.example.ar_interior_design_tool.java.common.samplerenderer.VertexBuffer
-import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BackgroundRenderer
-import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.PlaneRenderer
-import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.SpecularCubemapFilter
 import com.google.ar.core.exceptions.CameraNotAvailableException
 import com.google.ar.core.exceptions.NotYetAvailableException
-import java.io.File
-import java.io.FileWriter
 import java.io.IOException
-import java.io.OutputStreamWriter
 import java.nio.ByteBuffer
+
 
 /** Renders the HelloAR application using our example Renderer. */
 class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
@@ -97,6 +97,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     lateinit var render: SampleRender
     lateinit var planeRenderer: PlaneRenderer
     lateinit var backgroundRenderer: BackgroundRenderer
+    lateinit var depthRenderer: DepthRenderer
     lateinit var virtualSceneFramebuffer: Framebuffer
 
     var hasSetTextureNames = false
@@ -111,7 +112,6 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     var lastPointCloudTimestamp: Long = 0
 
     // Virtual object (ARCore pawn)
-    // TODO: switch to some other object
     lateinit var virtualObjectMesh: Mesh
     lateinit var virtualObjectShader: Shader
     lateinit var virtualObjectAlbedoTexture: Texture
@@ -157,7 +157,11 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         try {
             planeRenderer = PlaneRenderer(render)
             backgroundRenderer = BackgroundRenderer(render)
+            depthRenderer = DepthRenderer()
+            depthRenderer.createOnGlThread(activity)
+
             virtualSceneFramebuffer = Framebuffer(render, /*width=*/ 1, /*height=*/ 1)
+
 
             cubemapFilter =
                 SpecularCubemapFilter(render, CUBEMAP_RESOLUTION, CUBEMAP_NUMBER_OF_IMPORTANCE_SAMPLES)
@@ -257,6 +261,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     override fun onSurfaceChanged(render: SampleRender, width: Int, height: Int) {
         displayRotationHelper.onSurfaceChanged(width, height)
         virtualSceneFramebuffer.resize(width, height)
+        GLES20.glViewport(0, 0, width, height)
     }
 
     override fun onDrawFrame(render: SampleRender) {
@@ -311,7 +316,8 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
                     activity.depthSettings.depthColorVisualizationEnabled()
         if (camera.trackingState == TrackingState.TRACKING && shouldGetDepthImage) {
             try {
-                val depthImage = frame.acquireDepthImage16Bits()
+                // was: val depthImage = frame.acquireDepthImage16Bits()
+                val depthImage = frame.acquireRawDepthImage16Bits()
                 backgroundRenderer.updateCameraDepthTexture(depthImage)
                 depthImage.close()
             } catch (e: NotYetAvailableException) {
@@ -367,37 +373,38 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         camera.getViewMatrix(viewMatrix, 0)
         frame.acquirePointCloud().use { pointCloud ->
 
-            var len = pointCloud.points.limit()
-            while (len % 4 != 0) {
-                len++ // needs to be multiple of 4
-            }
-
-            Log.v(TAG, pointCloud.points.limit().toString())
-            // goal: write point cloud to a file so I can visualize it
-            // change number values to print out more / less objects
-            val dst = FloatArray(len) // size doesn't matter for now I think???
-            pointCloud.points.get(dst)
-            // every four values is an x, y, z and confidence value
-            val res = StringBuilder()
-            val itr = dst.iterator()
-            while (itr.hasNext()) {
-                res.append("%.5f".format(itr.next()))
-                res.append(" ")
-                res.append("%.5f".format(itr.next()))
-                res.append(" ")
-                res.append("%.5f".format(itr.next()))
-                res.append(" 4.2108e+06\n")
-                itr.next().toString() // throwaway confidence value
-            }
-
-            // holds current value of file
-            val fileContent = activity.openFileInput("idk").bufferedReader().use {
-                it.readText()
-            }
-
-            activity.openFileOutput("idk", Context.MODE_PRIVATE).use {
-                it.write(fileContent.toString().toByteArray() + res.toString().toByteArray())
-            }
+//            var len = pointCloud.points.limit()
+//            while (len % 4 != 0) {
+//                len++ // needs to be multiple of 4
+//            }
+//
+//            Log.v(TAG, pointCloud.points.limit().toString())
+//            // goal: write point cloud to a file so I can visualize it
+//            // change number values to print out more / less objects
+//            val dst = FloatArray(len) // size doesn't matter for now I think???
+//            pointCloud.points.get(dst)
+//            // every four values is an x, y, z and confidence value
+//            val res = StringBuilder()
+//            val itr = dst.iterator()
+//            while (itr.hasNext()) {
+//                res.append("%.5f".format(itr.next()))
+//                res.append(" ")
+//                res.append("%.5f".format(itr.next()))
+//                res.append(" ")
+//                res.append("%.5f".format(itr.next()))
+//                res.append(" 4.2108e+06\n")
+//                itr.next().toString() // throwaway confidence value
+//            }
+//
+//            // eventually
+//            // holds current value of file
+//            val fileContent = activity.openFileInput("idk").bufferedReader().use {
+//                it.readText()
+//            }
+//
+//            activity.openFileOutput("idk", Context.MODE_PRIVATE).use {
+//                it.write(fileContent.toString().toByteArray() + res.toString().toByteArray())
+//            }
 
             if (pointCloud.timestamp > lastPointCloudTimestamp) {
                 pointCloudVertexBuffer.set(pointCloud.points)
@@ -448,8 +455,21 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
             render.draw(virtualObjectMesh, virtualObjectShader, virtualSceneFramebuffer)
         }
 
+        // from raw depth codelab
+        val points = DepthData.create(frame, session.createAnchor(camera.pose)) ?: return
+
+        // TODO PROBLEM --> FIGURE OUT NEXT TIME YOU WORK ON IT
+        // MIGHT NOT EVEN NEED IDK YET
+//        if (activity.view.snackbarHelper.isShowing) {
+//            activity.view.snackbarHelper.hide(activity)
+//        }
+
+        // Visualize depth points. (raw depth api)
+        depthRenderer.update(points); // updates buffer w/ point(s?)
+        depthRenderer.draw(camera); // renders point cloud
+
         // Compose the virtual scene with the background.
-        backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR)
+        backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR) // TODO: why does this have to go after depthRenderer ????
 
     }
 

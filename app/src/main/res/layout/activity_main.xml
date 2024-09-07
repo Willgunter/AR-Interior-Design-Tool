@@ -25,7 +25,13 @@
         android:layout_height="fill_parent"
         android:layout_gravity="top" />
 
-<!--    <ImageButton-->
+    <TextView
+        android:id="@+id/snackbar_text"
+        android:layout_width="154dp"
+        android:layout_height="252dp"
+        android:layout_gravity="bottom" />
+
+    <!--    <ImageButton-->
 <!--        android:id="@+id/settings_button"-->
 <!--        android:layout_width="75dp"-->
 <!--        android:layout_height="75dp"-->

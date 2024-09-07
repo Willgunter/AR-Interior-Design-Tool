@@ -50,9 +50,22 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
     - Experimented a bit with trying to scan water bottle. problem is that the water bottle is transparent
     - Further experimentation is needed with non-transparent objects, but I think now might be a good time
     to start looking at ways to do mesh-generation / object reconstruction / filtering
+    - Would like to automate file wiping probably also because i do not like clicking a delete button
     
+  - 9/6/2024
+    - Started working on Raw Depth API codelab - ran into some issues but once I did some debugging it was
+    something more simple than I thought.
+    - Hopefully I will use a different model to increase the accuracy of the image (GMM possibly w/ EM, Mean Shift, or dbscan
+    Note to self: go slow with the Raw Depth API Codelab to make sure you don't have any persistent error messages
+    
+  - 9/7/2024
+    - Got Raw Depth pixels to display on screen along with camera image, very close to finishing Codelab
+    ![unnamed.jpg](..%2F..%2F..%2FWILLGU%7E1%2FAppData%2FLocal%2FTemp%2Funnamed.jpg)
+  
+  - Finish raw depth codelab then do object reconstruction then figure out how to extract color
   - NOTE TO SELF: INSERT A POINT CLOUD IMAGE HERE, try again with point cloud data in 1) better lighting
-  and 2) your whole room instead of just a small desk
+  and 2) your whole room instead of just a small desk - (could talk abt how raw depth has improved something on resume)
+  - NOTE TO SELF: FIGURE OUT HOW TO EXTRACT COLOR
 
 
 Resources used:

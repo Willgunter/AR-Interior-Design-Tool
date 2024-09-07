@@ -71,7 +71,8 @@ class ARInteriorDesignView(val activity: ARInteriorDesignActivity) : DefaultLife
      */
     fun showOcclusionDialogIfNeeded() {
         val session = session ?: return
-        val isDepthSupported = session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)
+//        val isDepthSupported = session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)
+        val isDepthSupported = session.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)
         if (!activity.depthSettings.shouldShowDepthEnableDialog() || !isDepthSupported) {
             return // Don't need to show dialog.
         }
@@ -115,7 +116,8 @@ class ARInteriorDesignView(val activity: ARInteriorDesignActivity) : DefaultLife
                 activity.depthSettings.useDepthForOcclusion(),
                 activity.depthSettings.depthColorVisualizationEnabled()
             )
-        if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+//        if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+        if (session.isDepthModeSupported(Config.DepthMode.RAW_DEPTH_ONLY)) {
             // With depth support, the user can select visualization options.
             val stringArray = resources.getStringArray(R.array.depth_options_array)
             AlertDialog.Builder(activity)
