@@ -63,6 +63,7 @@ public class ShaderUtil {
      * @throws RuntimeException If an OpenGL error is detected.
      */
     public static void checkGLError(String tag, String label) {
+        // error?
         int lastError = GLES20.GL_NO_ERROR;
         // Drain the queue of all errors.
         int error;

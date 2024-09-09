@@ -19,6 +19,8 @@ package com.example.ar_interior_design_tool.java.common.samplerenderer.arcore;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
+
 
 import com.example.ar_interior_design_tool.java.common.samplerenderer.ShaderUtil;
 import com.google.ar.core.Camera;
@@ -40,6 +42,9 @@ public class BoxRenderer {
     // Stores the triangulation of the cube.
     private FloatBuffer vertexBuffer;
     private ShortBuffer indexBuffer;
+
+    // Stuff for vPosition
+
 
     // Shader program.
     private int program;
@@ -125,6 +130,7 @@ public class BoxRenderer {
     }
 
     public void draw(AABB aabb, Camera camera) {
+
         float[] projectionMatrix = new float[16];
         camera.getProjectionMatrix(projectionMatrix, 0, 0.1f, 100.0f);
         float[] viewMatrix = new float[16];
@@ -132,16 +138,23 @@ public class BoxRenderer {
         float[] viewProjection = new float[16];
         Matrix.multiplyMM(viewProjection, 0, projectionMatrix, 0, viewMatrix, 0);
 
+        Log.v(TAG, "before Update Position");
+
         // Updates the positions of the cube.
         setCubeDimensions(aabb);
         GLES20.glUseProgram(program);
         GLES20.glUniformMatrix4fv(uViewProjection, 1, false, viewProjection, 0);
         GLES20.glEnableVertexAttribArray(vPosition);
         vertexBuffer.rewind();
-        GLES20.glVertexAttribPointer(vPosition, 3,
+        Log.v(TAG, "vPosition: " + vPosition);
+        GLES20.glVertexAttribPointer(vPosition, 3, // TODO: figure out how to fix vPosition error
                 GLES20.GL_FLOAT, false,
-                12, vertexBuffer);
-        ShaderUtil.checkGLError(TAG, "Draw"); // problem?
+                12, vertexBuffer);// problem? potential lead: https://stackoverflow.com/questions/41819516/gl-error-1282-for-both-glvertexattribpointer-and-gldrawarrays-only-when-using
+        // or try: https://www.reddit.com/r/opengl/comments/9vot14/getting_error_1282/
+//        - https://developer.android.com/reference/android/opengl/GLES20#glGetAttribLocation(int,%20java.lang.String)
+
+        ShaderUtil.checkGLError(TAG, "Draw");
+        Log.v(TAG, "before Draw Cube");
 
         // Draws a cube.
         GLES20.glEnable(GLES20.GL_BLEND);

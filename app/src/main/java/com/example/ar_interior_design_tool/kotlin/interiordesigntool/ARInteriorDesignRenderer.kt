@@ -476,12 +476,16 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         DepthData.filterUsingPlanes(points, session.getAllTrackables<Plane>(Plane::class.java))
         backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR) // TODO: why does this have to go after depthRenderer ????
 
-//        val clusteringHelper = PointClusteringHelper(points)
-//        val clusters = clusteringHelper.findClusters()
+        val clusteringHelper = PointClusteringHelper(points)
+        val clusters = clusteringHelper.findClusters()
+
+//          causes problems vvv
 //        for (aabb in clusters) {
 //        boxRenderer.draw(clusters[0], camera)
-//            Log.v(TAG, "aabb: " + aabb)
-//            boxRenderer.draw(aabb, camera) // here
+        if (clusters.size > 1) {
+            Log.v(TAG, "aabb: " + clusters[0].maxX + clusters[0].maxY + clusters[0].maxZ + clusters[0].minX + clusters[0].minY + clusters[0].minZ )
+            boxRenderer.draw(clusters[0], camera) // here
+        }
 //        }
 
         // Compose the virtual scene with the background.
