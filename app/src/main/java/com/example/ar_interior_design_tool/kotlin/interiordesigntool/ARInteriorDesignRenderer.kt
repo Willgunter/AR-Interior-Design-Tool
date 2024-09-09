@@ -15,7 +15,6 @@
  */
 package com.example.ar_interior_design_tool.kotlin.interiordesigntool
 
-import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLES30
 import android.opengl.Matrix
@@ -24,6 +23,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.ar_interior_design_tool.R
 import com.example.ar_interior_design_tool.java.common.helpers.DisplayRotationHelper
+import com.example.ar_interior_design_tool.java.common.helpers.PointClusteringHelper
 import com.example.ar_interior_design_tool.java.common.helpers.TrackingStateHelper
 import com.example.ar_interior_design_tool.java.common.samplerenderer.Framebuffer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.GLError
@@ -33,6 +33,7 @@ import com.example.ar_interior_design_tool.java.common.samplerenderer.Shader
 import com.example.ar_interior_design_tool.java.common.samplerenderer.Texture
 import com.example.ar_interior_design_tool.java.common.samplerenderer.VertexBuffer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BackgroundRenderer
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BoxRenderer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.DepthRenderer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.PlaneRenderer
 import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.SpecularCubemapFilter
@@ -98,6 +99,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
     lateinit var planeRenderer: PlaneRenderer
     lateinit var backgroundRenderer: BackgroundRenderer
     lateinit var depthRenderer: DepthRenderer
+    lateinit var boxRenderer: BoxRenderer
     lateinit var virtualSceneFramebuffer: Framebuffer
 
     var hasSetTextureNames = false
@@ -158,10 +160,13 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
             planeRenderer = PlaneRenderer(render)
             backgroundRenderer = BackgroundRenderer(render)
             depthRenderer = DepthRenderer()
+            boxRenderer = BoxRenderer()
+
+            // sets up the renderers on seperate threads
             depthRenderer.createOnGlThread(activity)
+            boxRenderer.createOnGlThread(activity);
 
             virtualSceneFramebuffer = Framebuffer(render, /*width=*/ 1, /*height=*/ 1)
-
 
             cubemapFilter =
                 SpecularCubemapFilter(render, CUBEMAP_RESOLUTION, CUBEMAP_NUMBER_OF_IMPORTANCE_SAMPLES)
@@ -456,7 +461,7 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
         }
 
         // from raw depth codelab
-        val points = DepthData.create(frame, session.createAnchor(camera.pose)) ?: return
+        val points = DepthData.create(frame, session.createAnchor(camera.pose)) ?: return // error?
 
         // TODO PROBLEM --> FIGURE OUT NEXT TIME YOU WORK ON IT
         // MIGHT NOT EVEN NEED IDK YET
@@ -465,12 +470,21 @@ class ARInteriorDesignRenderer(val activity: ARInteriorDesignActivity) :
 //        }
 
         // Visualize depth points. (raw depth api)
-        depthRenderer.update(points); // updates buffer w/ point(s?)
+        depthRenderer.update(points); // updates buffer w/ point(s?) // is this the issue?
         depthRenderer.draw(camera); // renders point cloud
 
-        // Compose the virtual scene with the background.
+        DepthData.filterUsingPlanes(points, session.getAllTrackables<Plane>(Plane::class.java))
         backgroundRenderer.drawVirtualScene(render, virtualSceneFramebuffer, Z_NEAR, Z_FAR) // TODO: why does this have to go after depthRenderer ????
 
+//        val clusteringHelper = PointClusteringHelper(points)
+//        val clusters = clusteringHelper.findClusters()
+//        for (aabb in clusters) {
+//        boxRenderer.draw(clusters[0], camera)
+//            Log.v(TAG, "aabb: " + aabb)
+//            boxRenderer.draw(aabb, camera) // here
+//        }
+
+        // Compose the virtual scene with the background.
     }
 
     /** Checks if we detected at least one plane. */

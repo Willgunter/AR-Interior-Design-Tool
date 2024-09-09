@@ -12,6 +12,7 @@ arcore = "1.45.0"
 firebaseInappmessaging = "21.0.0"
 material = "1.12.0"
 obj = "0.4.0"
+media3Common = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ ar-core = {group = "com.google.ar", name = "core", version.ref = "arcore"}
 firebase-inappmessaging = { group = "com.google.firebase", name = "firebase-inappmessaging", version.ref = "firebaseInappmessaging" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 obj = { group = "de.javagl", name = "obj", version.ref = "obj" }
+androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3Common" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -43,8 +43,7 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
     - Figured out some way to read and write to some file (huge win btw)
     - Figured out how to write to the file, and how to access the file
     - ⭐Ran into a huge problem printing out the points but solved it and now get reasonably good Point Cloud images
-  
-    
+
   - 9/5/2024
     - Changed code up a bit to print out point cloud data a lot better
     - Experimented a bit with trying to scan water bottle. problem is that the water bottle is transparent
@@ -60,7 +59,6 @@ An AR based app for Android that utilizes Google's ARCore library and open sourc
     
   - 9/7/2024
     - Got Raw Depth pixels to display on screen along with camera image, very close to finishing Codelab
-    ![unnamed.jpg](..%2F..%2F..%2FWILLGU%7E1%2FAppData%2FLocal%2FTemp%2Funnamed.jpg)
   
   - Finish raw depth codelab then do object reconstruction then figure out how to extract color
   - NOTE TO SELF: INSERT A POINT CLOUD IMAGE HERE, try again with point cloud data in 1) better lighting
@@ -72,6 +70,6 @@ Resources used:
   - (Basic Todo list tutorial in Kotlin) [https://github.com/philipplackner/TodoList/blob/master/app/src/main/java/com/example/todolist/MainActivity.kt]
   - (Google ARCore Documentation) [https://developers.google.com/ar/develop]
   - *(helpful post) [https://stackoverflow.com/questions/44749028/inflateexception-when-trying-to-use-a-snackbar]
-  - [Open3d Python library] (https://www.open3d.org/docs/release/getting_started.html)
+  - ![Open3d Python library] (https://www.open3d.org/docs/release/getting_started.html)
   - and
   - [PCD file (it says PointCloudLibrary with a small butterfly btw)] (https://pointclouds.org/documentation/tutorials/pcd_file_format.html)

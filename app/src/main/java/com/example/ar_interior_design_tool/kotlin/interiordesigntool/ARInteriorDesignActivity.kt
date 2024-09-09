@@ -13,6 +13,10 @@ import com.example.ar_interior_design_tool.java.common.helpers.FullScreenHelper
 import com.example.ar_interior_design_tool.java.common.helpers.InstantPlacementSettings
 import com.example.ar_interior_design_tool.kotlin.common.helpers.ARCoreSessionLifecycleHelper
 import com.example.ar_interior_design_tool.java.common.samplerenderer.SampleRender
+import com.example.ar_interior_design_tool.java.common.helpers.AABB;
+import com.example.ar_interior_design_tool.java.common.helpers.PointClusteringHelper;
+import com.example.ar_interior_design_tool.java.common.samplerenderer.arcore.BoxRenderer;
+import java.util.List;
 
 import com.google.ar.core.Config
 import com.google.ar.core.Config.InstantPlacementMode
